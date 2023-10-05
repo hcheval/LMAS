@@ -105,7 +105,7 @@ def plus (n : Nat) (m : Nat) := n + m
   for arbitrary types `α` and `β`, 
   takes some `a : α` and a function `f : α → β` and applies `f` to the argument `a`.
 -/
-def applyFunction {α β : Type} : α → (α → β) → β := sorry 
+def applyFunction (α β : Type) : α → (α → β) → β := sorry 
 
 /-
   ## Defining new types
@@ -176,7 +176,7 @@ end Hidden
     returning the pair `(b, a) : Prod β α`. 
 -/
 
-def swap {α β : Type} (p : Prod α β) : Prod β α := sorry 
+def swap (α β : Type) (p : Prod α β) : Prod β α := sorry 
 
 
 
