@@ -105,7 +105,8 @@ def plus (n : Nat) (m : Nat) := n + m
   for arbitrary types `α` and `β`, 
   takes some `a : α` and a function `f : α → β` and applies `f` to the argument `a`.
 -/
-def applyFunction (α β : Type) : α → (α → β) → β := sorry 
+def applyFunction (α β : Type) : α → (α → β) → β := 
+  fun a => fun f => f a
 
 /-
   ## Defining new types
@@ -130,7 +131,7 @@ structure Student where
     In Lean, you can always place an underscore where a term is expected, 
     and the infoview will show you its expected type if you move the carret over it.
 -/
-def me : Student := { name := _, group := _ }
+def me : Student := { name := "horatiu", group := 410 }
 
 /-
   We can access the fields of structure using dot notations, 
@@ -176,7 +177,8 @@ end Hidden
     returning the pair `(b, a) : Prod β α`. 
 -/
 
-def swap (α β : Type) (p : Prod α β) : Prod β α := sorry 
+def swap (α β : Type) (p : Prod α β) : Prod β α := 
+  (p.snd, p.fst)
 
 
 
@@ -263,7 +265,9 @@ def nonterminating : Nat → Nat
   **Exercise 5**:
     Using pattern matching, define the `factorial` function, computing the factorial of a natural number.
 -/
-def factorial : Nat → Nat := sorry 
+def factorial : Nat → Nat 
+| 0 => 1 
+| n + 1 => (n + 1) * (factorial n) 
 
 /-
   We can also prove theorems in Lean. This is not the subject of today's lab, 
@@ -302,7 +306,8 @@ end Hidden
 -/
 
 
-def sub? : Nat → Nat → Option Nat := sorry
+def sub? : Nat → Nat → Option Nat := 
+  fun n m => if n ≤ m then none else some (n - m) 
 
 -- sub? 5 3 = some 2
 -- sub? 2 7 = none
@@ -313,7 +318,10 @@ def sub? : Nat → Nat → Option Nat := sorry
 -/
 -- def myAdd' (n m : Nat) : Nat := 
 
-def myAdd : Nat → Nat → Nat := sorry
+def myAdd : Nat → Nat → Nat := 
+  fun n m => match n with 
+  | zero => m 
+  | succ n' => succ (myAdd n' m)
 
 
 
@@ -330,10 +338,10 @@ example : myAdd 28 49 = 77 := rfl
   Try to guess which one will succeed and then uncomment both theorems to see what happens.
 -/
 -- 0 + n = n
--- theorem zero_add (n : Nat) : myAdd 0 n = n := rfl 
+theorem zero_add (n : Nat) : myAdd 0 n = n := rfl 
 
 -- n + 0 = n
--- theorem add_zero (n : Nat) : myAdd n 0 = n := rfl
+theorem add_zero (n : Nat) : myAdd n 0 = n := rfl
 
 
 
