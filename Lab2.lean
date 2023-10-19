@@ -130,6 +130,12 @@ example : p → q → (p ∧ q) := sorry
 
 
 /-
+  Exercise 4: Give the shortest possible *term mode* proof you can think of for the above statement
+-/
+example : p → q → (p ∧ q) := sorry 
+
+
+/-
   Disjunction can be eliminated by pattern matching. 
   A proof of `p ∨ q` is, by definition, either a proof of `p` or a proof `q`.
   Dually, in order to prove `p ∨ q`, one chooses only one of the disjuncts and provides a proof for it. 
@@ -147,25 +153,23 @@ example : p ∨ q → q ∨ p := by
   | inr hp => 
     exact Or.inl hp
 
-
 /-
-  Exercise 4: Give the shortest possible *term mode* proof you can think of for the above statement
--/
-example : p → q → (p ∧ q) := sorry 
-
-/- Exercise 5: -/
-example : p → (¬p) → False := sorry 
+  Exercise 5: -/
+example : p ∧ q → q ∨ p := sorry 
 
 /- Exercise 6: -/
-example : p → (¬p) → q := sorry 
+example : p → (¬p) → False := sorry 
 
 /- Exercise 7: -/
-example : p ∧ (¬p) → q := sorry 
+example : p → (¬p) → q := sorry 
 
 /- Exercise 8: -/
-example : p → ¬¬p := sorry 
+example : p ∧ (¬p) → q := sorry 
 
 /- Exercise 9: -/
+example : p → ¬¬p := sorry 
+
+/- Exercise 10: -/
 example : ¬¬p → p := sorry 
 
 
