@@ -117,7 +117,7 @@ end
   logical principles that are false in general.
 -/
 
-section variable {α : Type}
+section 
 
   /- Exercise 6 -/
   example : (∀ p : Prop, p) ↔ False := sorry
@@ -127,6 +127,6 @@ section variable {α : Type}
   example : ¬(∀ p q : Prop, p ∨ q → p ∧ q) := sorry
 
   /- Exercise 8 -/
-  example : ¬(∀ (p q : α → Prop), (∀ x, p x ∨ q x) → (∀ x, p x) ∨ (∀ x, q x)) := sorry
+  example : ¬(∀ (p q : Nat → Prop), (∀ x, p x ∨ q x) → (∀ x, p x) ∨ (∀ x, q x)) := sorry
 
 end
