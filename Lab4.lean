@@ -1,6 +1,6 @@
 macro "use" e:term : tactic => `(tactic| refine Exists.intro $e ?_)
 
-
+set_option autoImplicit false 
 
 /- **Classical logic** -/
 
@@ -17,6 +17,8 @@ section
 -/
   variable {p q : Prop}
 
+  #check Classical.em
+
   example : ¬(p ∧ q) → ¬p ∨ ¬q := by
     intros h
     -- We are stuck. We could applying `Or.inl` or `Or.inr`, but there is no way to proceed afterwards. We need something extra.
@@ -24,7 +26,8 @@ section
                     -- one where `p` is assumed to be true, and one where it assumed to be false.
     . apply Or.inr
       intros hq
-      have hpq : p ∧ q := by exact And.intro h' hq
+      have hpq : p ∧ q := by
+        exact And.intro h' hq
       -- `have` allows us to add a new hypothesis (with a proof) in our local context
       -- Here, because we know `p` and `q`, we can add the hypothesis `p ∧ q`.
       contradiction
@@ -32,7 +35,11 @@ section
       assumption
 
   /- Exercise 1 -/
-  example : ¬¬p → p := sorry
+  example : ¬¬p → p := by
+    intros hnnp
+    by_cases h : p
+    . assumption
+    . contradiction
 
   /- Exercise 2 -/
   example : (p → q) → (¬p ∨ q) := sorry
@@ -113,7 +120,7 @@ end
 section
 
   /- Exercise 6 -/
-  example : (∀ p : Prop, p) ↔ Falses := sorry
+  example : (∀ p : Prop, p) ↔ False := sorry
 
 
   /- Exercise 7 -/
