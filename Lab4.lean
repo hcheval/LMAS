@@ -1,6 +1,6 @@
 macro "use" e:term : tactic => `(tactic| refine Exists.intro $e ?_)
 
-set_option autoImplicit false 
+set_option autoImplicit false
 
 /- **Classical logic** -/
 
@@ -117,7 +117,7 @@ end
   logical principles that are false in general.
 -/
 
-section
+section variable {α : Type}
 
   /- Exercise 6 -/
   example : (∀ p : Prop, p) ↔ False := sorry
