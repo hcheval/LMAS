@@ -42,7 +42,7 @@ example : ⊢K □(p → p) := by
   have l₂ : ⊢K (p → p) := tautology l₁
   exact necessitation l₂
 
-/- The translation of a standar proof you can find in the lecture notes -/
+/- The translation of a standard proof you can find in the lecture notes -/
 example : ⊢K (p → q) → ⊢K (□p → □q) := by
   intros h
   have l₁ : ⊢K □(p → q) := necessitation h
