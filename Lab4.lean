@@ -42,48 +42,32 @@ section
     . contradiction
 
   /- Exercise 2 -/
-  example : (p → q) → (¬p ∨ q) := sorry
+  example : (p → q) → (¬p ∨ q) := by
+    intros h
+    by_cases h' : p
+    . apply Or.inr
+      exact h h'
+    . apply Or.inl
+      assumption
 
   /- Exercise 3 -/
-  example : (¬p → ¬q) → (q → p) := sorry
+  example : (¬p → ¬q) → (q → p) := by
+    intros h hq
+    by_cases h' : p
+    . assumption
+    . apply False.elim
+      exact h h' hq
 
 end
 
 section variable {α : Type} {p : α → Prop}
 
-  /- Exercise 4 -/
-  example : ¬(∃ x : α, ¬p x) → (∀ x : α, p x) := sorry
 
   /- In exercise 6 of Lab3 we proved that `(∀ x : Nat, p x) → (∃ x : Nat, p x)`.
      This not only true for predicates on `Nat` but on other types too.
      *Before scrolling down*, is it true that for any type `α`, `(∀ x : α, p x) → (∃ x : α, p x)` holds?
      If not, can you think of a counterexample and of a condition that `α` needs to satisfy in order for the statement to be true?
   -/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
   /- The needed condition is for `α` to be nonempty. This condition is expressed in Lean as below, called `Inhabited α`.
@@ -95,12 +79,7 @@ section variable {α : Type} {p : α → Prop}
     specialize h default
     assumption
 
-  /- Exercise 5 -/
-  example [Inhabited α] : ¬(∀ x : α, ¬p x) → (∃ x : α, p x) := sorry
 
-
-
-end
 
 end
 
@@ -117,16 +96,37 @@ end
   logical principles that are false in general.
 -/
 
-section 
+section
 
   /- Exercise 6 -/
-  example : (∀ p : Prop, p) ↔ False := sorry
+  example : (∀ p : Prop, p) ↔ False := by
+    apply Iff.intro
+    . intros h
+      exact h False
+    . intros h
+      contradiction
 
 
   /- Exercise 7 -/
-  example : ¬(∀ p q : Prop, p ∨ q → p ∧ q) := sorry
+  example : ¬(∀ p q : Prop, p ∨ q → p ∧ q) := by
+    intros h
+    specialize h False True
+    specialize h (Or.inr True.intro)
+    cases h
+    contradiction
 
   /- Exercise 8 -/
-  example : ¬(∀ (p q : Nat → Prop), (∀ x, p x ∨ q x) → (∀ x, p x) ∨ (∀ x, q x)) := sorry
+  example : ¬(∀ (p q : Nat → Prop), (∀ x, p x ∨ q x) → (∀ x, p x) ∨ (∀ x, q x)) := by
+    intros h
+    specialize h (fun n => n = 0)
+    specialize h (fun n => ¬(n = 0))
+    specialize h (fun x => Classical.em _)
+    cases h with
+    | inl h' =>
+      specialize h' 1
+      contradiction
+    | inr h' =>
+      specialize h' 0
+      contradiction
 
 end

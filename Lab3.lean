@@ -37,14 +37,20 @@ example : ∀ n : Nat, 0 ≤ n := by
 
 #check Nat.zero_add
 /- Exercise 1. Hint: Use the lemma above -/
-example : ∀ n : Nat, 0 + n = n := sorry
+example : ∀ n : Nat, 0 + n = n := by
+  intros n
+  exact Nat.zero_add n
 
 #check Nat.add_comm
 /- Exercise 2. Hint: Use the lemma above -/
-example : ∀ (n : Nat) (m : Nat), n + m = m + n := sorry
+example : ∀ (n : Nat) (m : Nat), n + m = m + n := by
+  intros n m
+  exact Nat.add_comm n m
 
 /- Exercise 3 -/
-example : ∀ x : α, p x → p x := sorry
+example : ∀ x : α, p x → p x := by
+  intros a hp
+  exact hp
 
 /-
   If you have a universal hypothesis `h : ∀ x : α, p x`,
@@ -82,10 +88,22 @@ example : (∀ x : α, p x) ∧ (∀ x, q x) → (∀ x : α, p x ∧ q x) := by
   exact And.intro hp hq
 
 /- Exercise 4 -/
-example : (∀ x : α, p x ∧ q x) → (∀ x : α, p x) ∧ (∀ x, q x) := sorry
+example : (∀ x : α, p x ∧ q x) → (∀ x : α, p x) ∧ (∀ x, q x) := by
+  intros h
+  apply And.intro
+  . intros a
+    specialize h a
+    exact h.left
+  . intros a
+    specialize h a
+    exact h.right
 
 /- Exercise 5 -/
-example : (∀ x, p x → q x) → (∀ x, p x) → (∀ x, q x) := sorry
+example : (∀ x, p x → q x) → (∀ x, p x) → (∀ x, q x) := by
+  intros h h' a
+  specialize h a
+  specialize h' a
+  exact h h'
 
 
 /- ** Existential quantifier -/
@@ -114,13 +132,25 @@ example (m : Nat) : ∃ n : Nat, m + n = m := by
 variable (p q : Nat → Prop)
 
 /- Exercise 6 -/
-example : (∀ x : Nat, p x) → (∃ x : Nat, p x) := sorry
+example : (∀ x : Nat, p x) → (∃ x : Nat, p x) := by
+  intros h
+  use 17
+  specialize h 17
+  exact h
 
 /- Exercise 7 -/
-example : (∀ x : Nat, p x) → (∃ x : Nat, p x) ∨ (∃ x : Nat, q x) := sorry
+example : (∀ x : Nat, p x) → (∃ x : Nat, p x) ∨ (∃ x : Nat, q x) := by
+  intros h
+  apply Or.inl
+  use 42
+  specialize h 42
+  exact h
 
 /- Exercise 8 -/
-example : ∀ x : Nat, ∃ y : Nat, x = y := sorry
+example : ∀ x : Nat, ∃ y : Nat, x = y := by
+  intros x
+  use x
+  rfl
 
 /-
   If you have an existential hypothesis `h : ∃ x : α, p x`,
@@ -138,14 +168,49 @@ example : (∃ x : α, p x) → ¬(∀ x, ¬ p x) := by
   contradiction
 
 /- Exercise 9 -/
-example : (∃ x : α, p x ∨ q x) → (∃ x : α, p x) ∨ (∃ x : α, q x) := sorry
+example : (∃ x : α, p x ∨ q x) → (∃ x : α, p x) ∨ (∃ x : α, q x) := by
+  intros h
+  cases h with
+  | intro w hw =>
+    cases hw with
+    | inl hwp =>
+      apply Or.inl
+      use w
+      assumption
+    | inr hwq =>
+      apply Or.inr
+      use w
+      assumption
 
 /- Exercise 10 -/
-example : (∃ x : α, p x) ∨ (∃ x : α, q x) → (∃ x : α, p x ∨ q x) := sorry
+example : (∃ x : α, p x) ∨ (∃ x : α, q x) → (∃ x : α, p x ∨ q x) := by
+  intros h
+  cases h with
+  | inl hp =>
+    cases hp with
+    | intro w hwp =>
+      use w
+      exact Or.inl hwp
+  | inr hq =>
+    cases hq with
+    | intro w hwq =>
+      use w
+      exact Or.inr hwq
 
 variable {β : Type} (r : α → β → Prop)
 /- Exercise 11 -/
-example : (∃ x : α, ∀ y : β, r x y) → (∀ y : β, ∃ x : α, r x y) := sorry
+example : (∃ x : α, ∀ y : β, r x y) → (∀ y : β, ∃ x : α, r x y) := by
+  intros h y
+  cases h with
+  | intro w hw =>
+    use w
+    specialize hw y
+    exact hw
 
 /- Exercise 12 -/
-example : ¬(∃ x : α, ¬p x) → (∀ x, p x) := sorry
+example : (∀ x, p x) → ¬(∃ x, ¬p x) := by
+  intros h h'
+  cases h' with
+  | intro w hw =>
+    specialize h w
+    contradiction

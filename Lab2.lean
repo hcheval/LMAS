@@ -75,13 +75,14 @@ variable (p q : Prop)
   Hint: Look at the `applyFunction` function defined in Lab1
 -/
 theorem modus_ponens : p → (p → q) → q :=
-  fun hp hpq => hpq _
+  fun hp hpq => hpq hp
 
 /-
   Exercise 2: Prove the following theorem.
   Hint: Look at the `swap` function defined in Lab1
 -/
-theorem and_comm : p ∧ q → q ∧ p := sorry
+theorem and_comm : p ∧ q → q ∧ p :=
+  fun hpq => And.intro hpq.right hpq.left
 
 
 /-
@@ -129,14 +130,16 @@ theorem and_comm_tactics' : p ∧ q → q ∧ p := by
 /-
   Exercise 3: Prove the following theorem, using tactic mode
 -/
-example : p → q → (p ∧ q) := sorry
+example : p → q → (p ∧ q) := by
+  intros hp
+  intros hq
+  exact And.intro hp hq
 
 
 /-
   Exercise 4: Give the shortest possible *term mode* proof you can think of for the above statement
 -/
-example : p → q → (p ∧ q) := sorry
-
+example : p → q → (p ∧ q) := And.intro
 
 /-
   Disjunction can be eliminated by pattern matching.
@@ -158,34 +161,120 @@ example : p ∨ q → q ∨ p := by
 
 /-
   Exercise 5: -/
-example : p ∧ q → q ∨ p := sorry
+example : p ∧ q → q ∨ p := by
+  intros hpq
+  cases hpq with
+  | intro hp hq =>
+  exact Or.inl hq
 
 /- Exercise 6: -/
-example : p → (¬p) → False := sorry
+example : p → (¬p) → False := by
+  intros hp hnp
+  apply False.elim
+  exact hnp hp
 
 /- Exercise 7: -/
-example : p → (¬p) → q := sorry
+example : p → (¬p) → q := by
+  intros hp hnp
+  contradiction -- shorthand for the above
 
 /- Exercise 8: -/
-example : p ∧ (¬p) → q := sorry
+example : p ∧ (¬p) → q := by
+  intros hpnp
+  cases hpnp with
+  | intro hp hnp =>
+  contradiction
 
 /- Exercise 9: -/
-example : p → ¬¬p := sorry
+example : p → ¬¬p := by
+  intros hp hnp
+  contradiction
 
 /- Exercise 10: -/
-example : ¬¬p → p := sorry
+example : ¬¬p → p := by
+  intros hnnp
+  cases (Classical.em p) with
+  | inl hp =>
+    assumption
+  | inr hnp =>
+    contradiction
 
 variable (r : Prop)
 
 /- Bonus exercises. Use `Iff.intro` to split the equivalence into two implications. -/
-example : (p ∧ q → r) ↔ (p → q → r) := sorry
+example : (p ∧ q → r) ↔ (p → q → r) := by
+  apply Iff.intro
+  . intros h hp hq
+    exact h (And.intro hp hq)
+  . intros h hpq
+    exact h hpq.left hpq.right
 
-example : (p → q) ↔ (¬q → ¬p) := sorry
+example : (p → q) ↔ (¬q → ¬p) := by
+  apply Iff.intro
+  . intros h hnq hp
+    exact hnq (h hp)
+  . intros h hp
+    cases (Classical.em q) with
+    | inl hq =>
+      assumption
+    | inr hnq =>
+      apply False.elim
+      exact h hnq hp
 
-example : (p → q) ↔ (¬p ∨ q) := sorry
+example : (p → q) ↔ (¬p ∨ q) := by
+  apply Iff.intro
+  . intros h
+    cases (Classical.em p) with
+    | inl hp =>
+      exact Or.inr (h hp)
+    | inr hnp =>
+      exact Or.inl hnp
+  . intros h hp
+    cases h with
+    | inl hnp =>
+      contradiction
+    | inr hq =>
+      assumption
 
-example : ¬(p ∨ q) ↔ ¬p ∧ ¬q := sorry
+example : ¬(p ∨ q) ↔ ¬p ∧ ¬q := by
+  apply Iff.intro
+  . intros h
+    apply And.intro
+    . intros hp
+      exact h (Or.inl hp)
+    . intros hq
+      exact h (Or.inr hq)
+  . intros h h'
+    cases h' with
+    | inl hp =>
+      exact h.left hp
+    | inr hq =>
+      exact h.right hq
 
-example : ¬(p ∧ q) ↔ ¬p ∨ ¬q := sorry
+example : ¬(p ∧ q) ↔ ¬p ∨ ¬q := by
+  apply Iff.intro
+  . intros h
+    cases (Classical.em p) with
+    | inl hp =>
+      cases (Classical.em q) with
+      | inl hq =>
+        apply False.elim
+        exact h (And.intro hp hq)
+      | inr hnq =>
+        exact Or.inr hnq
+    | inr hnp =>
+      exact Or.inl hnp
+  . intros h hpq
+    cases h with
+    | inl hnp =>
+      exact hnp hpq.left
+    | inr hnq =>
+      exact hnq hpq.right
 
-example : (((p → q) → p) → p) := sorry
+
+example : (((p → q) → p) → p) := by
+  intros h
+  cases (Classical.em p) with
+  | inl hp => assumption
+  | inr hnp =>
+    exact h ((fun hnp hp => False.elim (hnp hp)) hnp)
