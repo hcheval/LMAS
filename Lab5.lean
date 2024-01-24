@@ -11,7 +11,7 @@ opaque Box : Prop → Prop
 prefix:max "□" => Box
 
 /- **Exercise 1**: Give the standard definition of diamond in terms of box. -/
-def Diamond (p : Prop) : Prop := sorry
+def Diamond (p : Prop) : Prop := ¬□¬p
 
 prefix:max "⋄" => Diamond
 
@@ -43,7 +43,7 @@ example : ⊢K □(p → p) := by
   exact necessitation l₂
 
 /- The translation of a standard proof you can find in the lecture notes -/
-example : ⊢K (p → q) → ⊢K (□p → □q) := by
+theorem example1 : ⊢K (p → q) → ⊢K (□p → □q) := by
   intros h
   have l₁ : ⊢K □(p → q) := necessitation h
   have l₂ : ⊢K (□(p → q) → □p → □q) := K
@@ -52,28 +52,61 @@ example : ⊢K (p → q) → ⊢K (□p → □q) := by
 /- You can use propositional proofs from previous labs, when needed -/
 
 /- **Exercise 2** -/
-example : ⊢K (□p → □¬¬p) := sorry
+example : ⊢K (□p → □¬¬p) := by
+  have l₁ : p → ¬¬p := fun hp hnp => hnp hp
+  have l₂ : ⊢K (p → ¬¬p) := tautology l₁
+  have l₃ : ⊢K □(p → ¬¬p) := necessitation l₂
+  have l₃ : ⊢K (□p → □¬¬p) := modusPonens l₃ K
+  exact l₃
 
 /- **Exercise 3**-/
-example : ⊢K (□p → □(q → p)) := sorry
+theorem ex3 : ⊢K (□p → □(q → p)) := by
+  have l₁ : p → q → p := fun hp hq => hp
+  have l₂ : ⊢K (p → q → p) := tautology l₁
+  have l₃ : ⊢K □(p → q → p) := necessitation l₂
+  have l₃ : ⊢K (□p → □(q → p)) := modusPonens l₃ K
+  exact l₃
 
 /- **Exercise 4** -/
-example : ⊢K □p → ⊢K □(q → p) := sorry
-
-/- **Exercise 4** -/
-example : ⊢K (□p ∧ □q → □q ∧ □p) := sorry
-
-/- **Exercise 5** -/
-example : ⊢K (p → q) → ⊢K (⋄p → ⋄q) := sorry
+example : ⊢K □p → ⊢K □(q → p) := by
+  intros l₁
+  exact modusPonens l₁ ex3
 
 /- **Exercise 6** -/
-example : ⊢K (□(p ∧ q) → □p ∧ □q) := sorry
+theorem ex6 : ⊢K (□(p ∧ q) → □p ∧ □q) := by
+  have l₁ : p ∧ q → p := fun h => And.left h
+  have l₂ : ⊢K (p ∧ q → p) := tautology l₁
+  have l₃ : ⊢K (□(p ∧ q) → □p) := example1 l₂
+  have l₄ : p ∧ q → q := fun h => And.right h
+  have l₅ : ⊢K (p ∧ q → q) := tautology l₄
+  have l₆ : ⊢K (□(p ∧ q) → □q) := example1 l₅
+  have l₇ : ∀ {r₁ r₂ r₃ : Prop}, ⊢K ((r₁ → r₂) → (r₁ → r₃) → (r₁ → r₂ ∧ r₃)) :=
+    tautology (fun h h' h'' => And.intro (h h'') (h' h''))
+  have l₈ := modusPonens l₆ (modusPonens l₃ l₇)
+  exact l₈
+
+
+/- **Exercise 5** -/
+example : ⊢K (p → q) → ⊢K (⋄p → ⋄q) := by
+  intros l₁
+  have l₂ : ∀ {r₁ r₂ : Prop}, ⊢K ((r₁ → r₂) → (¬r₂ → ¬r₁)) :=
+    tautology (fun h h' h'' => h' (h h''))
+  have l₃ : ⊢K (¬q → ¬p) := modusPonens l₁ l₂
+  have l₄ : ⊢K (□¬q → □¬p) := example1 l₃
+  have l₅ : ⊢K ((□¬q → □¬p) → (¬□¬p → ¬□¬q)) := l₂
+  have l₅ : ⊢K (¬□¬p → ¬□¬q) := modusPonens l₄ l₅
+  exact l₅
+
 
 /- **Exercise 7** -/
-example : ⊢K (□p ∧ □q → □(p ∧ q)) := sorry
+theorem ex7 : ⊢K (□p ∧ □q → □(p ∧ q)) := by
+  have l₁ : ⊢K (p → q → (p ∧ q)) := tautology (And.intro)
+  have l₂ : ⊢K (□p → □(q → (p ∧ q))) := example1 l₁
+  have l₃ : ⊢K (□(q → p ∧ q) → □q → □(p ∧ q)) := K
+  have l₄ : ∀ {r₁ r₂ r₃ : Prop}, ⊢K ((r₁ → r₂) → (r₂ → r₃) → (r₁ → r₃)) :=
+    tautology (fun h h' h'' => h' (h h''))
+  have l₅ : ⊢K (□p → (□q → □(p ∧ q))) := modusPonens l₃ (modusPonens l₂ l₄)
+  have l₆ : ∀ {r₁ r₂ r₃ : Prop}, ⊢K ((r₁ → r₂ → r₃) → r₁ ∧ r₂ → r₃) :=
+    tautology (fun h h' => h h'.left h'.right)
+  exact modusPonens l₅ l₆
 
-/- **Exercise 8** -/
-example : ⊢K (□p ∧ □q ↔ □(p ∧ q)) := sorry
-
-/- **Exercise 9** -/
-example : ⊢K (⋄(p ∨ q) ↔ (⋄p ∨ ⋄q)) := sorry
